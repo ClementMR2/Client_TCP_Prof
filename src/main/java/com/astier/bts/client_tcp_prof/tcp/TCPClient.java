@@ -17,7 +17,7 @@ import java.util.Arrays;
 import static javafx.scene.paint.Color.GREEN;
 import static javafx.scene.paint.Color.RED;
 
-public class TCPBinClient extends Thread {
+public class TCPClient extends Thread {
     int port;
     InetAddress serveur;
     Socket socket;
@@ -27,19 +27,20 @@ public class TCPBinClient extends Thread {
     HelloController fxmlCont;
     byte[] buffer = new byte[65535];
 
-    byte[] password = "mot de passe aes".getBytes(StandardCharsets.UTF_8);
-    byte[] iv = "ici vecteur d'in".getBytes(StandardCharsets.UTF_8);
-    Aes_cbc aes = new Aes_cbc(password, iv);
+    Aes_cbc aes;
+    ConfigAES configAes;
 
-    LectureJson lectureJson;
-
-    public TCPBinClient() {
+    public TCPClient() {
     }
 
-    public TCPBinClient(InetAddress serveur, int port, HelloController fxmlCont) {
+    public TCPClient(InetAddress serveur, int port, HelloController fxmlCont) throws FileNotFoundException {
         this.port = port;
         this.serveur = serveur;
         this.fxmlCont = fxmlCont;
+
+        configAes = LectureJson.getConfigAES();
+        aes = new Aes_cbc(configAes.passwordAsBytes(), configAes.ivAsBytes());
+
         System.out.println("@ serveur: " + serveur + " port: " + port);
     }
 
@@ -51,10 +52,10 @@ public class TCPBinClient extends Thread {
 
         try {
             socket.connect(endpoint, 2000);
-            //socket.setSoTimeout(5000);
-
             inBin = socket.getInputStream();
             outBin = socket.getOutputStream();
+
+            //socket.setSoTimeout(5000);
         } catch (Exception ex) {
             updateMessage(DiagnosticException.afficheException(ex));
         }
@@ -67,21 +68,14 @@ public class TCPBinClient extends Thread {
         fxmlCont.voyant.setFill(GREEN);
     }
 
-    public void testJson() throws FileNotFoundException {
-        lectureJson = new LectureJson("configuration.json");
-        ConfigAES configAes = lectureJson.getConfigAES();
-        System.out.println(configAes.password());
-        System.out.println(configAes.iv());
-    }
-
     public void deconnection() {
         if (!this.isAlive()) return;
 
         marche = false;
 
         try {
-            //outBin.write("exit\n".getBytes(StandardCharsets.UTF_8));
-            //outBin.flush();
+            outBin.write(aes.cryptage(("exit\n").getBytes(StandardCharsets.UTF_8))); // Message de sortie
+            outBin.flush();
             Thread.sleep(100);
             inBin.close();
             outBin.close();
@@ -111,12 +105,7 @@ public class TCPBinClient extends Thread {
                 int nbsLusBin = inBin.read(buffer);
                 if (nbsLusBin > 0) {
                     byte[] trameUtile = Arrays.copyOfRange(buffer, 0, nbsLusBin);
-
-                    String message = new String(aes.decryptage(trameUtile));
-                    updateMessage(message);
-
-                    //System.out.println(jsonReader.getPassword());
-                    //System.out.println(jsonReader.getIV());
+                    updateMessage(new String(aes.decryptage(trameUtile)));
                 }
             } catch (Exception ex) {
                 updateMessage(DiagnosticException.afficheException(ex));

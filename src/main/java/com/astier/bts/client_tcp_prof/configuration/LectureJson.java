@@ -8,15 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 public class LectureJson {
-    public String fileName;
-
-    public LectureJson(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public ConfigAES getConfigAES() throws FileNotFoundException {
+    public static ConfigAES getConfigAES() throws FileNotFoundException {
         Gson gson = new Gson();
-        FileReader fileReader = new FileReader(fileName);
+        FileReader fileReader = new FileReader("configuration.json");
         JsonReader jsonReader = new JsonReader(fileReader);
         return gson.fromJson(jsonReader, ConfigAES.class);
     }

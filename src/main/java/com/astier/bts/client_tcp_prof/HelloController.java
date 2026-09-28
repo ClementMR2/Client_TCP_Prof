@@ -1,7 +1,8 @@
 package com.astier.bts.client_tcp_prof;
 
 import com.astier.bts.client_tcp_prof.OUTILS.exceptions.DiagnosticException;
-import com.astier.bts.client_tcp_prof.tcp.TCPBinClient;
+import com.astier.bts.client_tcp_prof.multicast_diffusion.MulticastDiffusion;
+import com.astier.bts.client_tcp_prof.tcp.TCPClient;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -22,20 +23,17 @@ public class HelloController implements Initializable {
     public TextField TextFieldRequette;
     public Circle voyant;
     public TextArea TextAreaReponses;
-    static public TCPBinClient tcp;
+    static public TCPClient tcp;
     static boolean enRun = false;
     String adresse,port;
+    static MulticastDiffusion multicastDiffusion;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        tcp = new TCPBinClient();
-        voyant.setFill(RED);
-        connecter.setDisable(false);
-        deconnecter.setDisable(true);
+        getMulticastConfig();
 
         connecter.setOnMouseClicked(e -> {
             try {
-                tcp.testJson();
                 this.connecter();
             } catch (IOException ex) {
                 System.err.println(DiagnosticException.afficheException(ex));
@@ -57,6 +55,21 @@ public class HelloController implements Initializable {
                 System.err.println(DiagnosticException.afficheException(ex));
             }
         });
+
+        voyant.setFill(RED);
+        connecter.setDisable(false);
+        deconnecter.setDisable(true);
+    }
+
+    private void getMulticastConfig() {
+        try {
+            multicastDiffusion = new MulticastDiffusion();
+            Thread.sleep(1000);
+            TextFieldIP.setText(multicastDiffusion.connexion.addressAsString());
+            TextFieldPort.setText(String.valueOf(multicastDiffusion.connexion.portTCP()));
+        } catch (Exception ex) {
+            System.err.println(DiagnosticException.afficheException(ex));
+        }
     }
 
     private void envoyer() throws InterruptedException {
@@ -87,7 +100,7 @@ public class HelloController implements Initializable {
         adresse = TextFieldIP.getText();
         port = TextFieldPort.getText();
 
-        tcp = new TCPBinClient(InetAddress.getByName(adresse), Integer.parseInt(port), this); // Initialisation
+        tcp = new TCPClient(InetAddress.getByName(adresse), Integer.parseInt(port), this); // Initialisation
         tcp.connection();
 
         enRun = true;
