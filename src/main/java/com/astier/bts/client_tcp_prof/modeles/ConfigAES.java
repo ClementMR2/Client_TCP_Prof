@@ -1,6 +1,6 @@
 package com.astier.bts.client_tcp_prof.modeles;
 
-import com.astier.bts.client_tcp_prof.OUTILS.aes.Outils;
+import com.astier.bts.client_tcp_prof.aes.Outils;
 import com.google.gson.annotations.SerializedName;
 
 public record ConfigAES(@SerializedName("motDePasse") String mdp, String iv) {

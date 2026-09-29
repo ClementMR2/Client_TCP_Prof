@@ -1,8 +1,8 @@
 package com.astier.bts.client_tcp_prof.tcp;
 
 import com.astier.bts.client_tcp_prof.HelloController;
-import com.astier.bts.client_tcp_prof.OUTILS.aes.Aes_cbc;
-import com.astier.bts.client_tcp_prof.OUTILS.exceptions.DiagnosticException;
+import com.astier.bts.client_tcp_prof.aes.Aes_cbc;
+import com.astier.bts.client_tcp_prof.exceptions.DiagnosticException;
 import com.astier.bts.client_tcp_prof.configuration.LectureJson;
 import com.astier.bts.client_tcp_prof.modeles.ConfigAES;
 import javafx.application.Platform;
@@ -29,9 +29,6 @@ public class TCPClient extends Thread {
 
     Aes_cbc aes;
     ConfigAES configAes;
-
-    public TCPClient() {
-    }
 
     public TCPClient(InetAddress serveur, int port, HelloController fxmlCont) throws FileNotFoundException {
         this.port = port;

@@ -3,17 +3,12 @@
 package com.astier.bts.client_tcp_prof;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class HelloApplication extends Application {
     @Override
@@ -30,6 +25,7 @@ public class HelloApplication extends Application {
         }));
         stage.setTitle("TCP-Client  MM");
         stage.getIcons().add(new Image("/icone/index.jpg"));
+        stage.setResizable(false);
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.show();

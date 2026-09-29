@@ -1,4 +1,4 @@
-package com.astier.bts.client_tcp_prof.OUTILS.aes;
+package com.astier.bts.client_tcp_prof.aes;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
