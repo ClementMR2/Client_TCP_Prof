@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.net.*;
 
 public class MulticastDiffusion {
-    private final String MON_INTERFACE = "ethernet_32769";
+    //private final String MON_INTERFACE = "ethernet_32769";
     private InetAddress ip = InetAddress.getByName("224.0.0.250");
     private byte [] data = "Tu es qui?".getBytes();
     private int port = 5555;
@@ -19,8 +19,8 @@ public class MulticastDiffusion {
     private DatagramSocket dsReponse;
     public Connexion connexion;
 
-    public MulticastDiffusion() throws IOException {
-        NetworkInterface ni = NetworkInterface.getByName(MON_INTERFACE);
+    public MulticastDiffusion(String monInterface) throws IOException {
+        NetworkInterface ni = NetworkInterface.getByName(monInterface);
 
         ms = new MulticastSocket();
         ms.setNetworkInterface(ni);

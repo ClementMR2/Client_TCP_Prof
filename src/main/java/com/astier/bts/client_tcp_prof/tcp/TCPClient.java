@@ -63,6 +63,7 @@ public class TCPClient extends Thread {
         fxmlCont.connecter.setDisable(true);
         fxmlCont.deconnecter.setDisable(false);
         fxmlCont.voyant.setFill(GREEN);
+        fxmlCont.choiceBoxInterfaces.setDisable(true);
     }
 
     public void deconnection() {
@@ -84,6 +85,7 @@ public class TCPClient extends Thread {
         fxmlCont.connecter.setDisable(false);
         fxmlCont.deconnecter.setDisable(true);
         fxmlCont.voyant.setFill(RED);
+        fxmlCont.choiceBoxInterfaces.setDisable(false);
     }
 
     public void requette(String laRequette) {

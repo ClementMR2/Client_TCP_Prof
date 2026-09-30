@@ -1,8 +1,9 @@
 package com.astier.bts.client_tcp_prof;
 
 import com.astier.bts.client_tcp_prof.exceptions.DiagnosticException;
+import com.astier.bts.client_tcp_prof.modeles.Ipv4;
 import com.astier.bts.client_tcp_prof.multicast_diffusion.MulticastDiffusion;
-import com.astier.bts.client_tcp_prof.outils.Interfaces;
+import com.astier.bts.client_tcp_prof.outils.ScanInterfaces;
 import com.astier.bts.client_tcp_prof.tcp.TCPClient;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -11,12 +12,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 import javafx.scene.shape.Circle;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ResourceBundle;
 import static javafx.scene.paint.Color.*;
 
@@ -34,19 +32,33 @@ public class HelloController implements Initializable {
     static boolean enRun = false;
     String adresse,port;
     static MulticastDiffusion multicastDiffusion;
+    static String interfaceName;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            getConfig();
-            fillChoiceBox();
+            getInterfaces();
+
             connecter.setOnMouseClicked(_ -> this.connecter());
             deconnecter.setOnMouseClicked(_ -> this.deconnecter());
             button.setOnMouseClicked(_ -> this.envoyer());
             TextFieldRequette.setOnAction(_ -> this.envoyer());
-            // DAMN
             choiceBoxInterfaces.getSelectionModel().selectedItemProperty().addListener((observable, ancienneValeur, nouvelleValeur) -> {
-                setConfig((String) nouvelleValeur);
+                Ipv4 monInterface = (Ipv4) nouvelleValeur;
+                if (monInterface != null) {
+                    System.out.println("\t[ Interfaces ]");
+                    System.out.printf("""
+                            
+                            Type : %s
+                            Nom : %s
+                            IP : %s
+                            
+                            %n""", monInterface.interfaceType(), monInterface.interfaceName(), monInterface.ip());
+                }
+                assert monInterface != null;
+                interfaceName = monInterface.interfaceName();
+                new Thread(this::getConfig).start();
             });
         } catch (Exception e) {
             DiagnosticException.afficheException(e);
@@ -57,31 +69,21 @@ public class HelloController implements Initializable {
         deconnecter.setDisable(true);
     }
 
-    private void fillChoiceBox() {
+    private void getInterfaces() {
         try {
-            Interfaces.getIps().forEach(ip -> {
-                choiceBoxInterfaces.getItems().add(ip.interfaceName());
+            ScanInterfaces.getSystemIP().forEach(ip -> {
+                choiceBoxInterfaces.getItems().clear();
+                choiceBoxInterfaces.getItems().addAll(ip);
             });
         } catch (SocketException e) {
-            throw new RuntimeException(e);
+            System.err.println();
         }
     }
 
     private void getConfig() {
         try {
-            multicastDiffusion = new MulticastDiffusion();
-            Thread.sleep(1000);
-            TextFieldIP.setText(multicastDiffusion.connexion.addressAsString());
-            TextFieldPort.setText(String.valueOf(multicastDiffusion.connexion.portTCP()));
-        } catch (Exception ex) {
-            System.err.println(DiagnosticException.afficheException(ex));
-        }
-    }
-
-    private void setConfig(String val) {
-        try {
-            multicastDiffusion = new MulticastDiffusion();
-            Thread.sleep(1000);
+            multicastDiffusion = new MulticastDiffusion(interfaceName);
+            Thread.sleep(500);
             TextFieldIP.setText(multicastDiffusion.connexion.addressAsString());
             TextFieldPort.setText(String.valueOf(multicastDiffusion.connexion.portTCP()));
         } catch (Exception ex) {
@@ -112,6 +114,8 @@ public class HelloController implements Initializable {
         // Nettoyage
         TextAreaReponses.clear();
         TextFieldRequette.setText("");
+        choiceBoxInterfaces.getSelectionModel().clearSelection();
+        multicastDiffusion = null;
     }
 
     private void connecter() {
