@@ -34,7 +34,6 @@ public class HelloController implements Initializable {
     static MulticastDiffusion multicastDiffusion;
     static String interfaceName;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
@@ -44,7 +43,8 @@ public class HelloController implements Initializable {
             deconnecter.setOnMouseClicked(_ -> this.deconnecter());
             button.setOnMouseClicked(_ -> this.envoyer());
             TextFieldRequette.setOnAction(_ -> this.envoyer());
-            choiceBoxInterfaces.getSelectionModel().selectedItemProperty().addListener((observable, ancienneValeur, nouvelleValeur) -> {
+            choiceBoxInterfaces.getSelectionModel().selectedItemProperty().addListener(
+                    (observable, ancienneValeur, nouvelleValeur) -> {
                 Ipv4 monInterface = (Ipv4) nouvelleValeur;
                 if (monInterface != null) {
                     System.out.println("\t[ Interfaces ]");
@@ -131,7 +131,6 @@ public class HelloController implements Initializable {
         }
         tcp.connection();
 
-        enRun = true;
+        enRun = tcp.isAlive();
     }
-
 }

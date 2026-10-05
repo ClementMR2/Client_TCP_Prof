@@ -24,7 +24,7 @@ public class HelloApplication extends Application {
             }
         }));
         stage.setTitle("TCP-Client  MM");
-        stage.getIcons().add(new Image("/icone/index.jpg"));
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/icone/index.jpg")));
         stage.setResizable(false);
         Scene scene = new Scene(root);
         stage.setScene(scene);

@@ -23,16 +23,7 @@ public class ScanInterfaces {
         ArrayList<Ipv4> ipv4s = new ArrayList<>();
         interfaces.forEach(networkInterface -> {
             try {
-                String nomInterface = networkInterface.getName().toLowerCase();
-                String nomAffiche = networkInterface.getDisplayName().toLowerCase();
-                boolean estInterfaceVirtuelle =
-                        nomInterface.contains("virtual")
-                                || nomAffiche.contains("virtual")
-                                || nomAffiche.contains("hyper-v")
-                                || nomAffiche.contains("docker")
-                                || nomAffiche.contains("wsl")
-                                || nomAffiche.contains("vmware")
-                                || nomAffiche.contains("virtualbox");
+                boolean estInterfaceVirtuelle = isEstInterfaceVirtuelle(networkInterface);
                 if (networkInterface.isUp()
                         && !networkInterface.isLoopback()
                         && !networkInterface.isVirtual()
@@ -54,5 +45,17 @@ public class ScanInterfaces {
             }
         });
         return ipv4s;
+    }
+
+    private static boolean isEstInterfaceVirtuelle(NetworkInterface networkInterface) {
+        String nomInterface = networkInterface.getName().toLowerCase();
+        String nomAffiche = networkInterface.getDisplayName().toLowerCase();
+        return nomInterface.contains("virtual")
+                || nomAffiche.contains("virtual")
+                || nomAffiche.contains("hyper-v")
+                || nomAffiche.contains("docker")
+                || nomAffiche.contains("wsl")
+                || nomAffiche.contains("vmware")
+                || nomAffiche.contains("virtualbox");
     }
 }

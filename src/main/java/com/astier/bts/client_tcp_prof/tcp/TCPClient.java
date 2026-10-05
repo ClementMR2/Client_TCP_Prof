@@ -49,16 +49,29 @@ public class TCPClient extends Thread {
             socket.connect(endpoint, 2000);
             inBin = socket.getInputStream();
             outBin = socket.getOutputStream();
-            //socket.setSoTimeout(5000);
+            socket.setSoTimeout(5000); // Évite une attente sans fin.
+
+            dh = new DiffieHellman(this, 1024);
+            byte[] params = dh.recuperParams();
+            byte[] password = Arrays.copyOfRange(params, 1, 17);
+            byte[] iv = Arrays.copyOfRange(params, 17, 33);
+            aes = new Aes_cbc(password, iv);
+
+            updateMessage("""
+                    \tclef   :    %s
+                    \tIV     :    %s
+                    """.formatted(toHex(password), toHex(iv)));
+
+            socket.setSoTimeout(0); // Après l'échange, on peut attendre les réponses normalement.
         } catch (Exception ex) {
             updateMessage(DiagnosticException.afficheException(ex));
+            try {
+                socket.close();
+            } catch (IOException e) {
+                updateMessage(DiagnosticException.afficheException(e));
+            }
+            return;
         }
-
-        dh = new DiffieHellman(this, 1024);
-        byte[] params = dh.recuperParams();
-        byte[] password = Arrays.copyOfRange(params, 1, 17);
-        byte[] iv = Arrays.copyOfRange(params, 17, 33);
-        aes = new Aes_cbc(password, iv);
 
         marche = true;
         this.start();
@@ -122,5 +135,15 @@ public class TCPClient extends Thread {
     */
     protected void updateMessage(String message) {
         Platform.runLater(() -> fxmlCont.TextAreaReponses.appendText("    MESSAGE SERVEUR >  \n      " + message + "\n"));
+    }
+
+    public String toHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+
+        for (byte b : bytes) {
+            sb.append(String.format("%02X", b));
+        }
+
+        return sb.toString();
     }
 }
