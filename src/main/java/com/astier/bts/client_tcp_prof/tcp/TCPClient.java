@@ -2,6 +2,7 @@ package com.astier.bts.client_tcp_prof.tcp;
 
 import com.astier.bts.client_tcp_prof.HelloController;
 import com.astier.bts.client_tcp_prof.aes.Aes_cbc;
+import com.astier.bts.client_tcp_prof.diffie_hellman.DiffieHellman;
 import com.astier.bts.client_tcp_prof.exceptions.DiagnosticException;
 import com.astier.bts.client_tcp_prof.configuration.LectureJson;
 import com.astier.bts.client_tcp_prof.modeles.ConfigAES;
@@ -22,21 +23,18 @@ public class TCPClient extends Thread {
     InetAddress serveur;
     Socket socket;
     boolean marche = false;
-    OutputStream outBin;
-    InputStream inBin;
+    public OutputStream outBin;
+    public InputStream inBin;
     HelloController fxmlCont;
     byte[] buffer = new byte[65535];
 
     Aes_cbc aes;
-    ConfigAES configAes;
+    DiffieHellman dh;
 
     public TCPClient(InetAddress serveur, int port, HelloController fxmlCont) throws FileNotFoundException {
         this.port = port;
         this.serveur = serveur;
         this.fxmlCont = fxmlCont;
-
-        configAes = LectureJson.getConfigAES();
-        aes = new Aes_cbc(configAes.passwordAsBytes(), configAes.ivAsBytes());
 
         System.out.println("@ serveur: " + serveur + " port: " + port);
     }
@@ -51,11 +49,16 @@ public class TCPClient extends Thread {
             socket.connect(endpoint, 2000);
             inBin = socket.getInputStream();
             outBin = socket.getOutputStream();
-
             //socket.setSoTimeout(5000);
         } catch (Exception ex) {
             updateMessage(DiagnosticException.afficheException(ex));
         }
+
+        dh = new DiffieHellman(this, 1024);
+        byte[] params = dh.recuperParams();
+        byte[] password = Arrays.copyOfRange(params, 1, 17);
+        byte[] iv = Arrays.copyOfRange(params, 17, 33);
+        aes = new Aes_cbc(password, iv);
 
         marche = true;
         this.start();

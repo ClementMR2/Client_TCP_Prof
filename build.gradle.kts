@@ -38,10 +38,18 @@ javafx {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.1")
     implementation("com.google.code.gson:gson:2.14.0")
 }
 
+tasks.named<JavaCompile>("compileTestJava") {
+    extensions.getByType<org.javamodularity.moduleplugin.extensions.CompileTestModuleOptions>()
+        .setCompileOnClasspath(true)
+}
+
 tasks.withType<Test> {
+    extensions.getByType<org.javamodularity.moduleplugin.extensions.TestModuleOptions>()
+        .setRunOnClasspath(true)
     useJUnitPlatform()
 }
 
@@ -52,4 +60,3 @@ jlink {
         name = "app"
     }
 }
-
