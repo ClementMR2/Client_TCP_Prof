@@ -39,7 +39,7 @@ public class HelloController implements Initializable {
         try {
             getInterfaces();
 
-            connecter.setOnMouseClicked(_ -> this.connecter());
+            connecter.setOnMouseClicked(e -> this.connecter());
             deconnecter.setOnMouseClicked(_ -> this.deconnecter());
             button.setOnMouseClicked(_ -> this.envoyer());
             TextFieldRequette.setOnAction(_ -> this.envoyer());
