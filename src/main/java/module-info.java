@@ -5,7 +5,7 @@ module com.astier.bts.client_tcp_prof {
     requires java.net.http;
     requires jdk.jshell;
     requires com.google.gson;
-
+    //requires googleauth;
 
     opens com.astier.bts.client_tcp_prof to javafx.fxml;
     opens com.astier.bts.client_tcp_prof.modeles to com.google.gson; // Donner l'accès à come.google.gson

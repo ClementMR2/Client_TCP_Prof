@@ -4,8 +4,6 @@ import com.astier.bts.client_tcp_prof.HelloController;
 import com.astier.bts.client_tcp_prof.aes.Aes_cbc;
 import com.astier.bts.client_tcp_prof.diffie_hellman.DiffieHellman;
 import com.astier.bts.client_tcp_prof.exceptions.DiagnosticException;
-import com.astier.bts.client_tcp_prof.configuration.LectureJson;
-import com.astier.bts.client_tcp_prof.modeles.ConfigAES;
 import javafx.application.Platform;
 import java.io.*;
 import java.net.InetAddress;

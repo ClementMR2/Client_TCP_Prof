@@ -5,16 +5,15 @@ import com.astier.bts.client_tcp_prof.modeles.Ipv4;
 import com.astier.bts.client_tcp_prof.multicast_diffusion.MulticastDiffusion;
 import com.astier.bts.client_tcp_prof.outils.ScanInterfaces;
 import com.astier.bts.client_tcp_prof.tcp.TCPClient;
+import com.astier.bts.client_tcp_prof.totp.Totp;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.shape.Circle;
 
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import static javafx.scene.paint.Color.*;
 
@@ -37,6 +36,8 @@ public class HelloController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            verifierTotp();
+
             getInterfaces();
 
             connecter.setOnMouseClicked(e -> this.connecter());
@@ -67,6 +68,22 @@ public class HelloController implements Initializable {
         voyant.setFill(RED);
         connecter.setDisable(false);
         deconnecter.setDisable(true);
+    }
+    public void verifierTotp() {
+        boolean codeTotp;
+        while (true) {
+            TextInputDialog iniDialog = new TextInputDialog();
+            iniDialog.setTitle("Vérification Totp");
+            iniDialog.setHeaderText("");
+            iniDialog.setContentText("Code Totp: ");
+            Optional<String> textIn = iniDialog.showAndWait();
+
+            if (textIn.isPresent()) {
+                codeTotp = Totp.testTotp(Integer.parseInt(textIn.get()));
+            } else {
+                System.exit(0);
+            }
+        }
     }
 
     private void getInterfaces() {
